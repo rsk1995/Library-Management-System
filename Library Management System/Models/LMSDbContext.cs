@@ -8,7 +8,9 @@ namespace Library_Management_System.Models
         {
 
         }
-           public DbSet<Users> Users {  get; set; }
-        
+
+        public DbSet<Users> Users { get; set; }
+        public DbSet<Transactions> Transactions { get; set; }
+
     }
 }
