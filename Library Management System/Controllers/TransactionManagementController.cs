@@ -44,6 +44,7 @@ namespace Library_Management_System.Controllers
         public IActionResult ReturnBook(int tid)
         {
             var extran = _context.Transactions.FirstOrDefault(p => p.TransactionsID == tid);
+            var exbook = _context.Books.FirstOrDefault(p => p.BookId == extran.BookId);
             if (extran == null)
             {
                 return NotFound("Incorrect transaction ID!");
@@ -52,11 +53,13 @@ namespace Library_Management_System.Controllers
             {
                 DateTime borrowdate = extran.BorrowDate;
                 DateTime returndate = DateTime.Now;
-                int days = Convert.ToInt32(returndate - borrowdate);
+                TimeSpan diff = returndate - borrowdate;
+                int days = (int)diff.TotalDays;
                 if (days < 7)
                 {
                     extran.ReturnDate = DateTime.Now;
                     extran.FineAmount = 0;
+                    exbook.Status = "Available";
                     _context.SaveChanges();
                     return Ok("Book returned without fine!");
                 }
@@ -64,6 +67,7 @@ namespace Library_Management_System.Controllers
                 {
                     extran.ReturnDate = DateTime.Now;
                     extran.FineAmount = days * 10;
+                    exbook.Status = "Available";
                     _context.SaveChanges();
                 }
                 return Ok("Book returned with fine!");
