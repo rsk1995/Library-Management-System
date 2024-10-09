@@ -42,7 +42,7 @@ namespace Library_Management_System.Controllers
         }
 
         [HttpGet]
-        [Route("GetUserById")]
+        [Route("GetBookById")]
 
         public IActionResult GetBookById(int id)
         {
@@ -50,7 +50,7 @@ namespace Library_Management_System.Controllers
 
             if (book == null)
             {
-                return NotFound("Book Not Found");
+                return NotFound("Book Not Found For Requested ID");
             }
             else
             {
@@ -71,7 +71,7 @@ namespace Library_Management_System.Controllers
             }
             else
             {
-                return NotFound("Books Not Found");
+                return NotFound("Books Not Found For Requested Title");
             }
         }
         [HttpGet]
@@ -88,7 +88,93 @@ namespace Library_Management_System.Controllers
             }
             else
             {
-                return NotFound("Books Not Found");
+                return NotFound("Books Not Found For Requested Author");
+            }
+        }
+
+        [HttpGet]
+        [Route("GetBookByPublicationYear")]
+
+        public IActionResult GetBookByPublicationYear(int year)
+        {
+            var pubyear = _context.Books.Where(p => p.PublicationYear == year).ToList();
+
+            if (pubyear.Any())
+            {
+                return Ok(pubyear);
+
+            }
+            else
+            {
+                return NotFound("Books Not Found For Publication Year");
+            }
+        }
+        [HttpGet]
+        [Route("GetBookByGeneration")]
+
+        public IActionResult GetBookByGeneration(int generation)
+        {
+            var GENERATION = _context.Books.Where(p => p.Generation == generation).ToList();
+
+            if (GENERATION.Any())
+            {
+                return Ok(GENERATION);
+
+            }
+            else
+            {
+                return NotFound("Books Not Found For Requested Generation");
+            }
+        }
+
+        [HttpGet]
+        [Route("GetAvailableBook")]
+        public IActionResult GetAvailableBook()
+        {
+            var availableBook = _context.Books.Where(p => p.Status == "Available").ToList();
+
+            if (availableBook.Any())
+            {
+                return Ok(availableBook);
+
+            }
+            else
+            {
+                return NotFound("Books Not Available For Borrowing");
+            }
+        }
+
+
+        [HttpGet]
+        [Route("GetCheckedOutBook")]
+        public IActionResult GetCheckedOutBook()
+        {
+            var CheckedOutBook = _context.Books.Where(p => p.Status == "Checked Out").ToList();
+
+            if (CheckedOutBook.Any())
+            {
+                return Ok(CheckedOutBook);
+
+            }
+            else
+            {
+                return NotFound("Books are Available For Borrowing");
+            }
+        }
+        [HttpGet]
+        [Route("GetReservedBook")]
+        public IActionResult GetReservedBook()
+        {
+            var ReservedBook = _context.Books.Where(p => p.Status == "Reserved").ToList();
+
+            if (ReservedBook.Any())
+            {
+                return Ok(ReservedBook);
+
+            }
+            else
+            {
+                return NotFound("Requested books are  not available");
             }
         }
 
@@ -96,5 +182,5 @@ namespace Library_Management_System.Controllers
 
 
     }
-    }
+}
 
