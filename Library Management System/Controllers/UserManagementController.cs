@@ -1,9 +1,11 @@
 ﻿using Library_Management_System.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Library_Management_System.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class UserManagementController : ControllerBase
@@ -14,9 +16,9 @@ namespace Library_Management_System.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddUser")]
-
         public IActionResult AddNewUser([FromBody] UserDTO user)
         {
             var exuser = _context.Users.FirstOrDefault(p => p.Email == user.Email);
@@ -39,6 +41,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetAllUser")]
         public IActionResult GetAllUser()
@@ -46,9 +49,10 @@ namespace Library_Management_System.Controllers
             return Ok(_context.Users.ToList());
         }
 
+
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetUserById")]
-
         public IActionResult GetUserById(int id)
         {
             var exuser = _context.Users.FirstOrDefault(p => p.UserId == id);
@@ -62,6 +66,8 @@ namespace Library_Management_System.Controllers
                 return Ok(exuser);
             }
         }
+
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetUserByRole")]
 
@@ -79,6 +85,8 @@ namespace Library_Management_System.Controllers
                 return NotFound("Users Not Found");
             }
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("DeactiveUser")]
         public IActionResult DeactivateUser(int id)
@@ -101,7 +109,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("ReactiveUser")]
          public IActionResult ReactivateUser(int id)
