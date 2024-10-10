@@ -1,10 +1,12 @@
 ﻿using Library_Management_System.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace Library_Management_System.Controllers
 {
+    [Authorize(Roles = "Librarian")]
     [Route("api/[controller]")]
     [ApiController]
     public class TransactionManagementController : ControllerBase
@@ -90,7 +92,5 @@ namespace Library_Management_System.Controllers
                 return Ok("Book reserved!");
             }
         }
-
-
     }
 }
