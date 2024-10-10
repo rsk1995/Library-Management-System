@@ -1,4 +1,5 @@
 ﻿using Library_Management_System.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ namespace Library_Management_System.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddBooks")]
 
@@ -34,13 +36,15 @@ namespace Library_Management_System.Controllers
 
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("GetAllBooks")]
-        public IActionResult GetAllUser()
+        public IActionResult GetAllBooks()
         {
             return Ok(_context.Books.ToList());
         }
 
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetBookById")]
 
@@ -57,6 +61,8 @@ namespace Library_Management_System.Controllers
                 return Ok(book);
             }
         }
+
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetBookByTitle")]
 
@@ -74,6 +80,8 @@ namespace Library_Management_System.Controllers
                 return NotFound("Books Not Found For Requested Title");
             }
         }
+
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetBookByAuthor")]
 
@@ -92,6 +100,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetBookByPublicationYear")]
 
@@ -109,6 +118,8 @@ namespace Library_Management_System.Controllers
                 return NotFound("Books Not Found For Publication Year");
             }
         }
+
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetBookByGeneration")]
 
@@ -127,6 +138,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetAvailableBook")]
         public IActionResult GetAvailableBook()
@@ -144,7 +156,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetCheckedOutBook")]
         public IActionResult GetCheckedOutBook()
@@ -161,6 +173,8 @@ namespace Library_Management_System.Controllers
                 return NotFound("Books are Available For Borrowing");
             }
         }
+
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetReservedBook")]
         public IActionResult GetReservedBook()
@@ -177,10 +191,5 @@ namespace Library_Management_System.Controllers
                 return NotFound("Requested books are  not available");
             }
         }
-
-
-
-
     }
 }
-
