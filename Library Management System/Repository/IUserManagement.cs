@@ -10,5 +10,7 @@ namespace Library_Management_System.Repository
         Task<Users> GetUserById(int id);
         Task<Users> DeactivateUser(int id);
         Task<Users> ReactivateUser(int id);
+        Task<Users> UpdateUserInfomation(UpdateUser user);
+        Task<Users> DeleteUser(int uid);
     }
 }
