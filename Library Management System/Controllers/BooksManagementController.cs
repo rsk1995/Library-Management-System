@@ -1,4 +1,5 @@
 ﻿using Library_Management_System.Models;
+using Library_Management_System.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,50 +12,48 @@ namespace Library_Management_System.Controllers
     public class BooksManagementController : ControllerBase
     {
         private readonly LMSDbContext _context;
-        public BooksManagementController(LMSDbContext context)
+        private readonly IBookManagement _bookManagement;
+        public BooksManagementController(LMSDbContext context, IBookManagement bookManagement)
         {
             _context = context;
+            _bookManagement = bookManagement;
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddBooks")]
 
-        public IActionResult AddNewBook([FromBody] BookDTO book)
+        public async Task<IActionResult> AddNewBook([FromBody] BookDTO book)
         {
-            _context.Books.Add(new Books
+            if (book == null)
             {
-                Title = book.Title,
-                Author = book.Author,
-                Generation = book.Generation,
-                ISBN = book.ISBN,
-                PublicationYear= book.PublicationYear,
-                Status=book.Status
-            });
-            _context.SaveChanges();
-            return Ok("Book Added Successfully");
+                return BadRequest();
+            }
+
+            var createdBook=await _bookManagement.AddBook(book);
+            return Ok("Book added successfully");
 
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet]
         [Route("GetAllBooks")]
-        public IActionResult GetAllBooks()
+        public async Task<ActionResult<IEnumerable<Books>>> GetAllBooks()
         {
-            return Ok(_context.Books.ToList());
+            var AllBooks=await _bookManagement.GetAllBooks();
+            return Ok(AllBooks);
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetBookById")]
 
-        public IActionResult GetBookById(int id)
+        public async Task<ActionResult<Books>> GetBookById(int id)
         {
-            var book = _context.Books.FirstOrDefault(p => p.BookId == id);
-
+            var book = await _bookManagement.GetBookById(id);
             if (book == null)
             {
-                return NotFound("Book Not Found For Requested ID");
+                return NotFound("book Not Found");
             }
             else
             {
@@ -62,17 +61,17 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetBookByTitle")]
 
-        public IActionResult GetBookByTitle(string title)
+        public async Task<ActionResult<Books>> GetBookByTitle(string title)
         {
-            var Btitle = _context.Books.Where(p => p.Title == title).ToList();
+            var Book  = await _bookManagement.GetBookByTitle(title);
 
-            if (Btitle.Any())
+            if (Book.Any())
             {
-                return Ok(Btitle);
+                return Ok(Book);
 
             }
             else
@@ -81,13 +80,13 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetBookByAuthor")]
 
-        public IActionResult GetBookByAuthor(string author)
+        public async Task<ActionResult<Books>> GetBookByAuthor(string author)
         {
-            var Bauthor = _context.Books.Where(p => p.Author == author).ToList();
+            var Bauthor = await _bookManagement.GetBookByAuthor(author);
 
             if (Bauthor.Any())
             {
@@ -100,13 +99,13 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetBookByPublicationYear")]
 
-        public IActionResult GetBookByPublicationYear(int year)
+        public async Task<ActionResult<Books>> GetBookByPublicationYear(int year)
         {
-            var pubyear = _context.Books.Where(p => p.PublicationYear == year).ToList();
+            var pubyear = await _bookManagement.GetBookByPublicationYear(year);
 
             if (pubyear.Any())
             {
@@ -119,54 +118,58 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetBookByGeneration")]
 
-        public IActionResult GetBookByGeneration(int generation)
+        public async Task<ActionResult<Books>> GetBookByGeneration(int generation)
         {
-            var GENERATION = _context.Books.Where(p => p.Generation == generation).ToList();
-
-            if (GENERATION.Any())
+            if (generation == 0)
             {
-                return Ok(GENERATION);
+                return BadRequest("Enter book generation!"
+);          }
+
+            var gen = await _bookManagement.GetBookByPublicationYear(generation);
+
+            if (gen.Any())
+            {
+                return Ok(gen);
 
             }
             else
             {
-                return NotFound("Books Not Found For Requested Generation");
+                return NotFound("Books Not Found For Publication Year");
             }
+
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetAvailableBook")]
-        public IActionResult GetAvailableBook()
+        public async Task<ActionResult<Books>> GetAvailableBooks()
         {
-            var availableBook = _context.Books.Where(p => p.Status == "Available").ToList();
+            var Book = await _bookManagement.GetAvailableBooks();
 
-            if (availableBook.Any())
+            if (Book.Any())
             {
-                return Ok(availableBook);
-
+                return Ok(Book);
             }
             else
             {
-                return NotFound("Books Not Available For Borrowing");
+                return NotFound("Available books not found");
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetCheckedOutBook")]
-        public IActionResult GetCheckedOutBook()
+        public async Task<ActionResult<Books>> GetCheckedOutBook()
         {
-            var CheckedOutBook = _context.Books.Where(p => p.Status == "Checked Out").ToList();
+            var Book = await _bookManagement.GetCheckedOutBooks();
 
-            if (CheckedOutBook.Any())
+            if (Book.Any())
             {
-                return Ok(CheckedOutBook);
-
+                return Ok(Book);
             }
             else
             {
@@ -174,7 +177,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetReservedBook")]
         public IActionResult GetReservedBook()
