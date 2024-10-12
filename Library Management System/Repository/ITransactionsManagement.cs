@@ -7,6 +7,6 @@ namespace Library_Management_System.Repository
     {
         Task<Books> BorrowBook(Users user, Books book);
         Task<Transactions> ReturnBook(Transactions extran, Books exbook);
-         Task<Transactions> GetBookById(int id);
+        Task<Transactions> GetTransactionById(int id);
     }
 }
