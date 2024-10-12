@@ -71,5 +71,26 @@ namespace Library_Management_System.Repository
         {
             return await _context.Books.Where(p => p.Status.Contains("Reserved Book")).ToListAsync();
         }    
+
+        public async Task<Books> UpdateBookInformation(Books book)
+        {
+            var exbook = await _context.Books.FindAsync(book.BookId);
+            exbook.Title = book.Title;
+            exbook.Author = book.Author;
+            exbook.Generation = book.Generation;
+            exbook.ISBN = book.ISBN;
+            exbook.PublicationYear = book.PublicationYear;
+            exbook.Status = book.Status;
+            await _context.SaveChangesAsync();
+            return exbook;
+        }
+
+        public async Task<Books> DeleteBook(int bid)
+        {
+            var exbook = await _context.Books.FindAsync(bid);
+            _context.Books.Remove(exbook);
+            await _context.SaveChangesAsync();
+            return exbook;
+        }
     }
 }
