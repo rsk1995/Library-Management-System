@@ -18,8 +18,7 @@ namespace Library_Management_System.Repository
         Task<IEnumerable<Books>> GetAvailableBooks();
         Task<IEnumerable<Books>> GetCheckedOutBooks();
         Task<IEnumerable<Books>> GetReservedBook();
-
-
-
+        Task<Books> UpdateBookInformation(Books book);
+        Task<Books> DeleteBook(int bid);
     }
 }
