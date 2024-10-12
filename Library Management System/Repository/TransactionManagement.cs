@@ -24,6 +24,33 @@ namespace Library_Management_System.Repository
            await _context.SaveChangesAsync();
             return book;
         }
-        
+
+        public async Task<Transactions> ReturnBook(Transactions extran, Books exbook)
+        {
+            DateTime borrowdate = extran.BorrowDate;
+            DateTime returndate = DateTime.Now;
+            TimeSpan diff = returndate - borrowdate;
+            int days = (int)diff.TotalDays;
+            if (days < 7)
+            {
+                extran.ReturnDate = DateTime.Now;
+                extran.FineAmount = 0;
+                exbook.Status = "Available";
+                await _context.SaveChangesAsync();
+                return extran;
+            }
+            else  
+            {
+                extran.ReturnDate = DateTime.Now;
+                extran.FineAmount = days * 10;
+                exbook.Status = "Available";
+                await _context.SaveChangesAsync();
+                return extran;
+            }
+
+
+        }
+
     }
+
 }
