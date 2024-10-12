@@ -13,7 +13,7 @@ namespace Library_Management_System.Controllers
     {
         private readonly LMSDbContext _context;
         private readonly IUserManagement _userManagement;
-        public UserManagementController(LMSDbContext context,IUserManagement userManagement)
+        public UserManagementController(LMSDbContext context, IUserManagement userManagement)
         {
             _context = context;
             _userManagement = userManagement;
@@ -22,7 +22,7 @@ namespace Library_Management_System.Controllers
         //[Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddUser")]
-        public async Task<IActionResult> AddNewUser([FromBody]UserDTO user)
+        public async Task<IActionResult> AddNewUser([FromBody] UserDTO user)
         {
             var exuser = _context.Users.FirstOrDefault(p => p.Email==user.Email);
                 if (exuser==null)
@@ -130,6 +130,37 @@ namespace Library_Management_System.Controllers
             }
          }
 
+        [HttpPut]
+        [Route("UpdateUserInfo")]
+        public async Task<IActionResult> UpdateUserInfo([FromBody] UpdateUser user)
+        {
+            var exuser = await _userManagement.GetUserById(user.UserId);
+            if (exuser == null)
+            {
+                return NotFound("User Not Found!");
+            }
+            else
+            {
+                var user1 = await _userManagement.UpdateUserInfomation(user);
+                return Ok("User information updated successfully!");
+            }
+        }
 
+        [HttpDelete]
+        [Route("DeleteUser")]
+        public async Task<ActionResult<Users>> DeleteUser(int uid)
+        {
+
+            var exuser = await _userManagement.GetUserById(uid);
+            if (exuser == null)
+            {
+                return NotFound("User Not Found");
+            }
+            else
+            {
+                var user = await _userManagement.DeleteUser(uid);
+                return Ok("User Deleted Successfully!\n\n" + user.ToString());
+            }
+        }
     } 
 }
