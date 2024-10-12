@@ -1,4 +1,5 @@
 ﻿using Library_Management_System.Models;
+using Library_Management_System.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,52 +12,52 @@ namespace Library_Management_System.Controllers
     public class UserManagementController : ControllerBase
     {
         private readonly LMSDbContext _context;
-        public UserManagementController(LMSDbContext context)
+        private readonly IUserManagement _userManagement;
+        public UserManagementController(LMSDbContext context,IUserManagement userManagement)
         {
             _context = context;
+            _userManagement = userManagement;
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddUser")]
-        public IActionResult AddNewUser([FromBody] UserDTO user)
+        public async Task<IActionResult> AddNewUser([FromBody]UserDTO user)
         {
-            var exuser = _context.Users.FirstOrDefault(p => p.Email == user.Email);
-            if (exuser == null)
-            {
-                _context.Users.Add(new Users
+            var exuser = _context.Users.FirstOrDefault(p => p.Email==user.Email);
+                if (exuser==null)
                 {
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Email = user.Email,
-                    Password = user.Password,
-                    Role = user.Role
-                });
-                _context.SaveChanges();
-                return Ok("New User Added Successfully...!");
-            }
-            else
-            {
-                return Ok("User Already Exist");
-            }
+
+
+                    var createdUser = await _userManagement.AddUser(user);
+                    return Ok("User added successfully");
+                }
+                else
+                {
+                    return Ok("User Already Exist");
+                }
+            
+
+            
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+       // [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetAllUser")]
-        public IActionResult GetAllUser()
+        public async Task<ActionResult<IEnumerable<Books>>> GetAllUser()
         {
-            return Ok(_context.Users.ToList());
+            var AllUsers = await _userManagement.GetAllUsers();
+            return Ok(AllUsers);
         }
 
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetUserById")]
-        public IActionResult GetUserById(int id)
+        public async Task<ActionResult<Users>> GetUserById(int id)
         {
-            var exuser = _context.Users.FirstOrDefault(p => p.UserId == id);
-
+            
+            var exuser = await _userManagement.GetUserById(id); 
             if (exuser == null)
             {
                 return NotFound("User Not Found");
@@ -67,13 +68,13 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+       // [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetUserByRole")]
 
-        public IActionResult GetUserByRole(string role)
+        public async Task<ActionResult<Users>> GetUserByRole(string role)
         {
-            var exusers = _context.Users.Where(p => p.Role == role).ToList();
+            var exusers = await _userManagement.GetUserByRole(role);
 
             if (exusers.Any())
             {
@@ -86,12 +87,12 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("DeactiveUser")]
-        public IActionResult DeactivateUser(int id)
+        public async Task<IActionResult> DeactivateUser(int id)
         {
-            var exuser = _context.Users.FirstOrDefault(p => p.UserId == id);
+            var exuser = await _userManagement.GetUserById(id);
 
             if (exuser == null)
             {
@@ -103,18 +104,17 @@ namespace Library_Management_System.Controllers
             }
             else
             {
-                exuser.IsActive = 0;
-                _context.SaveChanges();
-                return Ok("User " + exuser.FirstName + " " + exuser.LastName + " has been deactivated.");
+                var exuser1 = await _userManagement.DeactivateUser(id);
+                return Ok("User " + exuser1.FirstName + " " + exuser1.LastName + " has been deactivated.");
             }
         }
 
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("ReactiveUser")]
-         public IActionResult ReactivateUser(int id)
+         public async Task<IActionResult> ReactivateUser(int id)
          {
-            var exuser = _context.Users.FirstOrDefault(p => p.UserId == id);
+            var exuser = await _userManagement.GetUserById(id);
             if (exuser == null)
             {
                 return NotFound("User Not Found");
@@ -125,10 +125,11 @@ namespace Library_Management_System.Controllers
             }
             else
             {
-                exuser.IsActive = 1;
-                _context.SaveChanges();
+                var exuser1 = await _userManagement.ReactivateUser(id);
                 return Ok("User " + exuser.FirstName + " " + exuser.LastName + " has been reactivated.");
             }
          }
+
+
     } 
 }
