@@ -1,5 +1,6 @@
 using System.Text;
 using Library_Management_System.Models;
+using Library_Management_System.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -13,6 +14,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IBookManagement, BookManagement>();
+builder.Services.AddScoped<IUserManagement, UserManagement>();
+builder.Services.AddScoped<ITransactionsManagement,TransactionManagement>();
 
 builder.Services.AddAuthentication(options =>
 {
