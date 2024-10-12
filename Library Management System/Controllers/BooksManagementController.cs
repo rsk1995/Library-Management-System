@@ -194,5 +194,37 @@ namespace Library_Management_System.Controllers
                 return NotFound("Requested books are  not available");
             }
         }
+
+        [HttpPut]
+        [Route("UpdateBookInfo")]
+        public async Task<IActionResult> UpdateBookInfo([FromBody] Books book)
+        {
+            var exbook = await _bookManagement.GetBookById(book.BookId);
+            if (exbook == null)
+            {
+                return NotFound("Book Not Found!");
+            }
+            else
+            {
+                var book1 = await _bookManagement.UpdateBookInformation(book);
+                return Ok("Book information updated successfully...!");
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteBook")]
+        public async Task<IActionResult> DeleteBook(int bid)
+        {
+            var exbook = await _bookManagement.GetBookById(bid);
+            if (exbook == null)
+            {
+                return NotFound("Book Not Found!");
+            }
+            else
+            {
+                var book1 = await _bookManagement.DeleteBook(bid);
+                return Ok("Book deleted successfully...!");
+            }
+        }
     }
 }
