@@ -6,9 +6,11 @@ namespace Library_Management_System.Repository
     public class UserManagement:IUserManagement
     {
         private readonly LMSDbContext _context;
+        //private readonly IUserManagement _userManagement;
         public UserManagement(LMSDbContext context)
         {
             _context = context;
+            //_userManagement = userManagement;
         }
 
         public async Task<IEnumerable<Users>> GetAllUsers()
@@ -49,19 +51,35 @@ namespace Library_Management_System.Repository
             var exuser=await _context.Users.FindAsync(id);
         
              exuser.IsActive = 0;
-             _context.SaveChangesAsync();
+             await _context.SaveChangesAsync();
             return exuser;
         }
 
         public async Task<Users> ReactivateUser(int id)
         {
             var exuser = await _context.Users.FindAsync(id);
-
             exuser.IsActive = 1;
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return exuser;
         }
 
+        public async Task<Users> UpdateUserInfomation(UpdateUser user)
+        {
+            var exuser = await _context.Users.FindAsync(user.UserId);
+            exuser.FirstName = user.FirstName;
+            exuser.LastName = user.LastName;
+            exuser.Role = user.Role;
+            await _context.SaveChangesAsync();
+            return exuser;
+        }
+
+        public async Task<Users> DeleteUser(int uid)
+        {
+            var exuser = await _context.Users.FindAsync(uid);
+            _context.Users.Remove(exuser);
+            await _context.SaveChangesAsync();
+            return exuser;
+        }
 
     }
 }
