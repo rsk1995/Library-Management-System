@@ -1,4 +1,5 @@
 ﻿using Library_Management_System.Models;
+using Library_Management_System.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -6,33 +7,33 @@ using System.Net;
 
 namespace Library_Management_System.Controllers
 {
-    [Authorize(Roles = "Librarian")]
+   // [Authorize(Roles = "Librarian")]
     [Route("api/[controller]")]
     [ApiController]
     public class TransactionManagementController : ControllerBase
     {
         private readonly LMSDbContext _context;
-        public TransactionManagementController(LMSDbContext context)
+        private readonly ITransactionsManagement _transactionManagement;
+        private readonly IBookManagement _bookManagement;
+        private readonly IUserManagement _userManagement;
+        public TransactionManagementController(LMSDbContext context,ITransactionsManagement transactionsManagement,IBookManagement bookManagement,IUserManagement userManagement)
         {
             _context = context;
+            _transactionManagement = transactionsManagement;
+            _bookManagement = bookManagement;
+            _userManagement = userManagement;
         }
 
         [HttpPost]
         [Route("BorrowBook")]
-        public IActionResult BorrowBook(int userid, int bookid)
+        public async Task<IActionResult> BorrowBook(int userid, int bookid)
         {
-            var exuser = _context.Users.FirstOrDefault(p => p.UserId == userid);
-            var exbook = _context.Books.FirstOrDefault(p => p.BookId == bookid);
+            var exuser = await _userManagement.GetUserById(userid);
+            var exbook = await _bookManagement.GetBookById(bookid);
+             
             if (exuser.IsActive == 1 && exbook.Status=="Available")
             {
-                _context.Transactions.Add(new Transactions
-                {
-                    UserId = userid,
-                    BookId = bookid,
-                    BorrowDate=DateTime.Now
-                });
-                exbook.Status = "Checked Out";
-                _context.SaveChanges();
+                var borrow = await _transactionManagement.BorrowBook(exuser,exbook);
                 return Ok("Book borrowed Successfully");
             }
             else
