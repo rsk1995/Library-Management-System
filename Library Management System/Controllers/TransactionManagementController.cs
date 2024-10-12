@@ -46,16 +46,16 @@ namespace Library_Management_System.Controllers
         [Route("ReturnBook")]
         public async Task<IActionResult> ReturnBook(int tid)
         {
-            var extran = _context.Transactions.FirstOrDefault(p => p.TransactionsID == tid);
-            var exbook = await _bookManagement.GetBookById(bookid);
+            var extran = await _transactionManagement.GetTransactionById(tid);
             if (extran == null)
             {
                 return NotFound("Incorrect transaction ID!");
             }
             else
             {
+                var exbook = await _bookManagement.GetBookById(extran.BookId);
                 var trans = await _transactionManagement.ReturnBook(extran, exbook);
-                if(trans.FineAmount == 0)
+                if (trans.FineAmount == 0)
                 {
                     return Ok("Book returned without fine!");
                 }
@@ -78,6 +78,22 @@ namespace Library_Management_System.Controllers
                 exbook.Status = "Reserved";
                 _context.SaveChanges();
                 return Ok("Book reserved!");
+            }
+        }
+
+        [HttpGet]
+        [Route("GetTransationById")]
+
+        public async Task<ActionResult<Transactions>> GetTransationById(int tid)
+        {
+            var trans = await _transactionManagement.GetTransactionById(tid);
+            if (trans == null)
+            {
+                return NotFound("Transaction Not Found");
+            }
+            else
+            {
+                return Ok(trans);
             }
         }
     }
