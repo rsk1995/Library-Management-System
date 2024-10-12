@@ -47,10 +47,11 @@ namespace Library_Management_System.Repository
                 await _context.SaveChangesAsync();
                 return extran;
             }
-
-
         }
 
+        public async Task<Transactions> GetTransactionById(int id)
+        {
+            return await _context.Transactions.FindAsync(id);
+        }
     }
-
 }
