@@ -1,13 +1,15 @@
-﻿using Library_Management_System.Models;
+﻿using Library_Management_System.Migrations;
+using Library_Management_System.Models;
 using Library_Management_System.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Cryptography;
 
 namespace Library_Management_System.Controllers
 {
-    [Authorize(Roles = "Librarian")]
+    //[Authorize(Roles = "Librarian")]
     [Route("api/[controller]")]
     [ApiController]
     public class TransactionManagementController : ControllerBase
@@ -23,6 +25,7 @@ namespace Library_Management_System.Controllers
             _bookManagement = bookManagement;
             _userManagement = userManagement;
         }
+        
         [Authorize(Roles = "Admin,Librarian")]
         [HttpPost]
         [Route("BorrowBook")]
@@ -30,8 +33,11 @@ namespace Library_Management_System.Controllers
         {
             var exuser = await _userManagement.GetUserById(userid);
             var exbook = await _bookManagement.GetBookById(bookid);
-             
-            if (exuser.IsActive == 1 && exbook.Status=="Available")
+            if (exbook == null || exuser == null)
+            {
+                return NotFound("User or Book not found!");
+            }
+            else if (exuser.IsActive == 1 && exbook.Status=="Available")
             {
                 var borrow = await _transactionManagement.BorrowBook(exuser,exbook);
                 return Ok("Book borrowed Successfully");
@@ -42,7 +48,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpPut]
         [Route("ReturnBook")]
         public async Task<IActionResult> ReturnBook(int tid)
@@ -64,25 +70,31 @@ namespace Library_Management_System.Controllers
 
             }
         }
-        [Authorize(Roles = "Admin,Librarian")]
-        [HttpPut]
+        
+        //[Authorize(Roles = "Admin,Librarian,Member")]
+        [HttpPost]
         [Route("ReserveBook")]
-        public IActionResult ReserverBook(int bid)
+        public async Task<IActionResult> ReserverBook(int uid, int bid)
         {
-            var exbook = _context.Books.FirstOrDefault(p => p.BookId == bid);
-            if (exbook == null)
+
+            var exuser = await _userManagement.GetUserById(uid);
+            var exbook = await _bookManagement.GetBookById(bid);
+            if (exbook == null || exuser == null)
             {
-                return NotFound("Book not found!");
+                return NotFound("User or Book not found!");
+            }
+            else if (exuser.IsActive == 1 && exbook.Status == "Available")
+            {
+                await _transactionManagement.ReserveBook(exuser, exbook);
+                return Ok("Book reserved Successfully");
             }
             else
             {
-                exbook.Status = "Reserved";
-                _context.SaveChanges();
-                return Ok("Book reserved!");
+                return BadRequest("User deactivated or book not available!");
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian")]
+        //[Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetTransationById")]
 
@@ -96,6 +108,52 @@ namespace Library_Management_System.Controllers
             else
             {
                 return Ok(trans);
+            }
+        }
+
+        //[Authorize("Admin,Librarian")]
+        [HttpPatch]
+        [Route("BorrowReservedBooks")]
+        public async Task<ActionResult> BorrowResevedBooks(int tid)
+        {
+            var trans = await _transactionManagement.GetTransactionById(tid);
+            if (trans == null)
+            {
+                return NotFound("Transaction Not Found");
+            }
+            else
+            {
+                var exbook = await _bookManagement.GetBookById(trans.BookId);
+                await _transactionManagement.BorrowReserveBook(trans,exbook);
+                return Ok("Reserved book borrowed Successfully");
+            }
+        }
+
+        //[Authorize("Admin,Librarian")]
+        [HttpGet]
+        [Route("GetReservedTransaction")]
+        public async Task<ActionResult<Transactions>> GetReservedTransaction(int uid)
+        {
+            var exuser = await _userManagement.GetUserById(uid);
+            if (exuser == null)
+            {
+                return NotFound("User not found!");
+            }
+            else if (exuser.IsActive == 1)
+            {
+                var extrans = await _transactionManagement.GetReservedTransaction(uid);
+                if (extrans.Any())
+                {
+                    return Ok(extrans);
+                }
+                else
+                {
+                    return NotFound("Transaction not found!");
+                }
+            }
+            else
+            {
+                return BadRequest("User deactivated!");
             }
         }
     }
