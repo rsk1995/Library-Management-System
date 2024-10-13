@@ -7,7 +7,7 @@ using System.Net;
 
 namespace Library_Management_System.Controllers
 {
-   // [Authorize(Roles = "Librarian")]
+    [Authorize(Roles = "Librarian")]
     [Route("api/[controller]")]
     [ApiController]
     public class TransactionManagementController : ControllerBase
@@ -23,7 +23,7 @@ namespace Library_Management_System.Controllers
             _bookManagement = bookManagement;
             _userManagement = userManagement;
         }
-
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpPost]
         [Route("BorrowBook")]
         public async Task<IActionResult> BorrowBook(int userid, int bookid)
@@ -42,6 +42,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpPut]
         [Route("ReturnBook")]
         public async Task<IActionResult> ReturnBook(int tid)
@@ -63,7 +64,7 @@ namespace Library_Management_System.Controllers
 
             }
         }
-
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpPut]
         [Route("ReserveBook")]
         public IActionResult ReserverBook(int bid)
@@ -81,6 +82,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetTransationById")]
 
