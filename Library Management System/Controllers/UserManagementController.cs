@@ -19,7 +19,7 @@ namespace Library_Management_System.Controllers
             _userManagement = userManagement;
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddUser")]
         public async Task<IActionResult> AddNewUser([FromBody] UserDTO user)
@@ -41,7 +41,7 @@ namespace Library_Management_System.Controllers
             
         }
 
-       // [Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetAllUser")]
         public async Task<ActionResult<IEnumerable<Books>>> GetAllUser()
@@ -51,7 +51,7 @@ namespace Library_Management_System.Controllers
         }
 
 
-        //[Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian,Member")]
         [HttpGet]
         [Route("GetUserById")]
         public async Task<ActionResult<Users>> GetUserById(int id)
@@ -68,7 +68,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-       // [Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetUserByRole")]
 
@@ -87,7 +87,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("DeactiveUser")]
         public async Task<IActionResult> DeactivateUser(int id)
@@ -109,7 +109,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-       // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [Route("ReactiveUser")]
          public async Task<IActionResult> ReactivateUser(int id)
@@ -130,6 +130,7 @@ namespace Library_Management_System.Controllers
             }
          }
 
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpPut]
         [Route("UpdateUserInfo")]
         public async Task<IActionResult> UpdateUserInfo([FromBody] UpdateUser user)
@@ -146,6 +147,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpDelete]
         [Route("DeleteUser")]
         public async Task<ActionResult<Users>> DeleteUser(int uid)
