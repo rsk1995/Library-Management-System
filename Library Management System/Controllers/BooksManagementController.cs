@@ -19,7 +19,7 @@ namespace Library_Management_System.Controllers
             _bookManagement = bookManagement;
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route("AddBooks")]
 
@@ -35,7 +35,7 @@ namespace Library_Management_System.Controllers
 
         }
 
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Librarian,Member")]
         [HttpGet]
         [Route("GetAllBooks")]
         public async Task<ActionResult<IEnumerable<Books>>> GetAllBooks()
@@ -44,7 +44,7 @@ namespace Library_Management_System.Controllers
             return Ok(AllBooks);
         }
 
-        //[Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian,Member")]
         [HttpGet]
         [Route("GetBookById")]
 
@@ -61,7 +61,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian,Member")]
         [HttpGet]
         [Route("GetBookByTitle")]
 
@@ -80,7 +80,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian,Member")]
         [HttpGet]
         [Route("GetBookByAuthor")]
 
@@ -99,7 +99,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian,Member")]
         [HttpGet]
         [Route("GetBookByPublicationYear")]
 
@@ -118,7 +118,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian,Member")]
         [HttpGet]
         [Route("GetBookByGeneration")]
 
@@ -143,7 +143,7 @@ namespace Library_Management_System.Controllers
 
         }
 
-        //[Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian,Member")]
         [HttpGet]
         [Route("GetAvailableBook")]
         public async Task<ActionResult<Books>> GetAvailableBooks()
@@ -160,7 +160,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetCheckedOutBook")]
         public async Task<ActionResult<Books>> GetCheckedOutBook()
@@ -177,7 +177,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        //[Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpGet]
         [Route("GetReservedBook")]
         public IActionResult GetReservedBook()
@@ -194,7 +194,7 @@ namespace Library_Management_System.Controllers
                 return NotFound("Requested books are  not available");
             }
         }
-
+        [Authorize(Roles = "Admin,Librarian")]
         [HttpPut]
         [Route("UpdateBookInfo")]
         public async Task<IActionResult> UpdateBookInfo([FromBody] Books book)
@@ -210,7 +210,7 @@ namespace Library_Management_System.Controllers
                 return Ok("Book information updated successfully...!");
             }
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpDelete]
         [Route("DeleteBook")]
         public async Task<IActionResult> DeleteBook(int bid)
