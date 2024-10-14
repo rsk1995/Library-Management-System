@@ -118,7 +118,7 @@ namespace Library_Management_System.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Librarian,Member")]
+        //[Authorize(Roles = "Admin,Librarian,Member")]
         [HttpGet]
         [Route("GetBookByGeneration")]
 
@@ -129,7 +129,7 @@ namespace Library_Management_System.Controllers
                 return BadRequest("Enter book generation!"
 );          }
 
-            var gen = await _bookManagement.GetBookByPublicationYear(generation);
+            var gen = await _bookManagement.GetBookByGenration(generation);
 
             if (gen.Any())
             {
@@ -138,7 +138,7 @@ namespace Library_Management_System.Controllers
             }
             else
             {
-                return NotFound("Books Not Found For Publication Year");
+                return NotFound("Books Not Found For given generation");
             }
 
         }
